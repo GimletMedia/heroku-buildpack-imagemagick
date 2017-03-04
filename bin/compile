@@ -14,7 +14,7 @@ mkdir -p $VENDOR_DIR
 INSTALL_DIR="$VENDOR_DIR/imagemagick"
 mkdir -p $INSTALL_DIR
 if [ -d $ENV_DIR ]; then
-  ENV_FILE = "$ENV_DIR/IMAGE_MAGICK_VERSION"
+  ENV_FILE="$ENV_DIR/IMAGE_MAGICK_VERSION"
   if [ -f $ENV_FILE ]; then
     IMAGE_MAGICK_VERSION="`cat $ENV_FILE`"
   else
@@ -22,7 +22,7 @@ if [ -d $ENV_DIR ]; then
   fi
 else
   IMAGE_MAGICK_VERSION="6.9.5-10"
-fi  
+fi
 CACHE_FILE="$CACHE_DIR/imagemagick-$IMAGE_MAGICK_VERSION.tar.gz"
 
 if [ ! -f $CACHE_FILE ]; then
