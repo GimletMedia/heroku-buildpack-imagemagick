@@ -18,10 +18,10 @@ if [ -d $ENV_DIR ]; then
   if [ -f $ENV_FILE ]; then
     IMAGE_MAGICK_VERSION="`cat $ENV_FILE`"
   else
-    IMAGE_MAGICK_VERSION="6.9.5-10"
+    IMAGE_MAGICK_VERSION="7.0.10-11"
   fi
 else
-  IMAGE_MAGICK_VERSION="6.9.5-10"
+  IMAGE_MAGICK_VERSION="7.0.10-11"
 fi
 CACHE_FILE="$CACHE_DIR/imagemagick-$IMAGE_MAGICK_VERSION.tar.gz"
 
