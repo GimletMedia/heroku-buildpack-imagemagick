@@ -11,7 +11,8 @@ CACHE_DIR=$2
 ENV_DIR=$3
 VENDOR_DIR="$BUILD_DIR/vendor"
 mkdir -p $VENDOR_DIR
-INSTALL_DIR="$VENDOR_DIR/imagemagick"
+REL_INSTALL_DIR="imagemagick"
+INSTALL_DIR="$VENDOR_DIR/$REL_INSTALL_DIR"
 mkdir -p $INSTALL_DIR
 if [ -d $ENV_DIR ]; then
   ENV_FILE="$ENV_DIR/IMAGE_MAGICK_VERSION"
@@ -55,7 +56,6 @@ if [ ! -f $CACHE_FILE ]; then
   # cache for future deploys
   echo "-----> Caching ImageMagick installation"
   cd $VENDOR_DIR
-  REL_INSTALL_DIR="imagemagick"
   tar czf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
   mv $REL_INSTALL_DIR.tar.gz $CACHE_FILE
 
