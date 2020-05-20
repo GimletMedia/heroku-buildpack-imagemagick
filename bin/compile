@@ -9,7 +9,7 @@ echo "-----> Install ImageMagick"
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
-VENDOR_DIR="$BUILD_DIR/vendor"
+VENDOR_DIR="$BUILD_DIR/rel/overlays"
 mkdir -p $VENDOR_DIR
 REL_INSTALL_DIR="imagemagick"
 INSTALL_DIR="$VENDOR_DIR/$REL_INSTALL_DIR"
