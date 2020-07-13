@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 
-echo "ImageMagick"
+# this pack is valid for all apps
+echo "imagemagick-webp"
 exit 0

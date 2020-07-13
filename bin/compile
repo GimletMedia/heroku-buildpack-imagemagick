@@ -9,25 +9,58 @@ echo "-----> Install ImageMagick"
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
+
+fetch_config() {
+  if [ -d $ENV_DIR ]; then
+    ENV_FILE="$ENV_DIR/$1"
+      if [ -f $ENV_FILE ]; then
+        cat $ENV_FILE
+      else
+        echo "$2"
+      fi
+  else
+    echo "$2"
+  fi
+}
+
+IMAGE_MAGICK_VERSION=$(fetch_config IMAGE_MAGICK_VERSION "7.0.10-11")
+LIBWEBP_VERSION=$(fetch_config LIBWEBP_VERSION "1.0.3")
+
 VENDOR_DIR="$BUILD_DIR/rel/overlays"
-mkdir -p $VENDOR_DIR
 REL_INSTALL_DIR="imagemagick"
 INSTALL_DIR="$VENDOR_DIR/$REL_INSTALL_DIR"
+CACHE_FILE="$CACHE_DIR/imagemagick-$IMAGE_MAGICK_VERSION-webp-$LIBWEBP_VERSION.tar.xz"
+
+mkdir -p $VENDOR_DIR
 mkdir -p $INSTALL_DIR
-if [ -d $ENV_DIR ]; then
-  ENV_FILE="$ENV_DIR/IMAGE_MAGICK_VERSION"
-  if [ -f $ENV_FILE ]; then
-    IMAGE_MAGICK_VERSION="`cat $ENV_FILE`"
-  else
-    IMAGE_MAGICK_VERSION="7.0.10-11"
-  fi
-else
-  IMAGE_MAGICK_VERSION="7.0.10-11"
-fi
-CACHE_FILE="$CACHE_DIR/imagemagick-$IMAGE_MAGICK_VERSION.tar.gz"
 
 if [ ! -f $CACHE_FILE ]; then
+  # install libwebp
+
+  LIBWEBP_FILE="libwebp-$LIBWEBP_VERSION.tar.gz"
+  LIBWEBP_DIR="libwebp-$LIBWEBP_VERSION"
+  LIBWEBP_URL="http://downloads.webmproject.org/releases/webp/$LIBWEBP_FILE"
+
+  echo "-----> Downloading libwebp from $LIBWEBP_URL"
+  wget $LIBWEBP_URL -P $BUILD_DIR | indent
+
+  echo "-----> Extracting libwebp from $BUILD_DIR/$LIBWEBP_FILE"
+  if [ ! -f $BUILD_DIR/$LIBWEBP_FILE ]; then
+    echo "Error: Unable to download ImageMagick" | indent
+    ls $BUILD_DIR | indent
+    exit 1;
+  fi
+  tar xvf $BUILD_DIR/$LIBWEBP_FILE | indent
+
+  echo "-----> Building libwebp"
+  cd $LIBWEBP_DIR
+  ./configure --prefix=$INSTALL_DIR --disable-static
+  make && make install
+  cd ..
+  rm -rf $LIBWEBP_DIR
+
   # install imagemagick
+
   IMAGE_MAGICK_FILE="ImageMagick-$IMAGE_MAGICK_VERSION.tar.xz"
   IMAGE_MAGICK_DIR="ImageMagick-$IMAGE_MAGICK_VERSION"
   # SSL cert used on imagemagick not recognized by heroku.
@@ -54,14 +87,14 @@ if [ ! -f $CACHE_FILE ]; then
   rm -rf $IMAGE_MAGICK_DIR
 
   # cache for future deploys
-  echo "-----> Caching ImageMagick installation"
+  echo "-----> Caching ImageMagick+libwebp installation"
   cd $VENDOR_DIR
   tar czf $REL_INSTALL_DIR.tar.gz $REL_INSTALL_DIR
   mv $REL_INSTALL_DIR.tar.gz $CACHE_FILE
 
 else
   # cache exists, extract it
-  echo "-----> Extracting ImageMagick $CACHE_FILE => $VENDOR_DIR"
+  echo "-----> Extracting ImageMagick+libwebp $CACHE_FILE => $VENDOR_DIR"
   tar xzf $CACHE_FILE -C $VENDOR_DIR
 fi
 
@@ -83,4 +116,4 @@ ACTUAL_INSTALL_PATH="$HOME/$REL_INSTALL_DIR"
 mkdir -p $(dirname $PROFILE_PATH)
 echo "export PATH=$ACTUAL_INSTALL_PATH/bin:\$PATH" >> $PROFILE_PATH
 echo "export LD_LIBRARY_PATH=$ACTUAL_INSTALL_PATH/lib:\$LD_LIBRARY_PATH" >> $PROFILE_PATH
-echo "export MAGICK_CONFIGURE_PATH=$ACTUAL_INSTALL_PATH" >> $PROFILE_PATH
+echo "export MAGICK_CONFIGURE_PATH=$ACTUAL_INSTALL_PATH/etc/ImageMagick-7" >> $PROFILE_PATH
