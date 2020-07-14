@@ -56,6 +56,7 @@ if [ ! -f $CACHE_FILE ]; then
   cd $LIBWEBP_DIR
   ./configure --prefix=$INSTALL_DIR --disable-static --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder --enable-libwebpextras
   make && make install
+  export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$INSTALL_DIR/lib/pkgconfig"
   cd ..
   rm -rf $LIBWEBP_DIR
 
